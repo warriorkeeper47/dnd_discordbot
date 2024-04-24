@@ -7,9 +7,7 @@ import random
 from datetime import datetime
 from dotenv import load_dotenv
 
-intents = discord.Intents.default()
-intents.messages = True
-intents.guilds = True
+intents = discord.Intents.all()
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
