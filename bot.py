@@ -14,7 +14,7 @@ intents.guilds = True
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = discord.Client()
+client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
