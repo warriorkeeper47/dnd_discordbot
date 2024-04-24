@@ -5,8 +5,11 @@ from discord.ext import commands
 import aiosqlite
 import random
 from datetime import datetime
-
 from dotenv import load_dotenv
+
+intents = discord.Intents.default()
+intents.messages = True
+intents.guilds = True
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -19,7 +22,7 @@ async def on_ready():
 
 client.run(TOKEN)
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
