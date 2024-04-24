@@ -14,13 +14,12 @@ intents.guilds = True
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = discord.Client(intents=intents)
+bot = discord.Client(intents=intents)
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f'{client.user} has connected to Discord!')
+    print(f'{bot.user} has connected to Discord!')
 
-client.run(TOKEN)
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -37,6 +36,8 @@ async def roll(ctx, sides: int):
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
+
+bot.run(TOKEN)
 
 # @bot.event
 # async def on_ready():
