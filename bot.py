@@ -43,13 +43,19 @@ def roll_dice(num_dice, sides):
 
 # Initiative methods
 def sort_init():
+    print("Sort")
+    print(initOrder)
     initOrder.sort(key=lambda x: x[1], reverse=True)
 
 def show_init():
+    print("Show")
+    print(initOrder)
     sort_init()
     return f"Initiative order: {initOrder}"
 
 def add_init(name, roll):
+    print("Add")
+    print(initOrder)
     if name not in initOrder:
         initOrder.append((name, roll))
         sort_init()
@@ -60,6 +66,8 @@ def add_init(name, roll):
     return message
 
 def remove_init(name):
+    print("Remove")
+    print(initOrder)
     if name in initOrder:
         removedArr = [n for n in initOrder if n[0] != name]
         initOrder = removedArr
@@ -69,6 +77,7 @@ def remove_init(name):
     return message
 
 def clear_init():
+    print("clear")
     initOrder.clear()
     return f"Initiative order has been cleared."
 
@@ -97,7 +106,10 @@ async def roll(ctx, dice: str):
 
 @bot.command(name='init')
 async def init(ctx, com: str, name: str=None, roll: int=0):
+    print("called init")
+    print(f"initOrder: {initOrder}")
     com = com.lower()
+    print(f"com: {com}")
     if com == "add":
         if roll <= 0 or roll==None:
             await ctx.send("No number given for initiative order.")
