@@ -152,10 +152,10 @@ async def register(ctx, role:str="player"): # TODO check if admin
     discord_id = ctx.author.id  # Discord ID
     name = ctx.author.name      # Discord username
     await add_or_update_user(discord_id, name, role)
-    await ctx.send(f"{name}, you have been registered/updated.")
+    await ctx.send(f"{name}, you have been registered/updated with role: {role}.")
 
 @bot.command(name='printUsers')
-async def register(ctx):
+async def printUsers(ctx):
     message = await print_all_users()
     await ctx.send(message)
 
