@@ -20,6 +20,30 @@ bot = commands.Bot(command_prefix='/', intents=intents)
 ### Global Variables ###
 initOrder = []
 
+####################
+### DB FUNCTIONS ###
+####################
+
+async def setup_database():
+    async with aiosqlite.connect('bot_database.db') as db:
+        await db.execute('''CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            discord_id INTEGER UNIQUE,
+            name TEXT
+        )''')
+        await db.commit()
+
+async def add_or_update_user(discord_id, name):
+    async with aiosqlite.connect('bot_database.db') as db:
+        cursor = await db.execute('SELECT * FROM users WHERE discord_id = ?', (discord_id,))
+        result = await cursor.fetchone()
+        if result:
+            await db.execute('UPDATE users SET name = ? WHERE discord_id = ?', (name, discord_id))
+        else:
+            await db.execute('INSERT INTO users (discord_id, name) VALUES (?, ?)', (discord_id, name))
+        await db.commit()
+
+
 ############################
 ##### Helper Functions #####
 ############################
@@ -80,6 +104,14 @@ def generate_name():
 ####################
 ##### Commands #####
 ####################
+
+@bot.command(name='register')
+async def register(ctx):
+    discord_id = ctx.author.id  # Discord ID
+    name = ctx.author.name      # Discord username
+    await add_or_update_user(discord_id, name)
+    await ctx.send(f"{name}, you have been registered/updated.")
+
 
 @bot.command(name='roll')
 async def roll(ctx, dice: str):
