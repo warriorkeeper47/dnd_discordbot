@@ -16,6 +16,9 @@ bot = discord.Client(intents=intents)
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+### Global Variables ###
+initOrder = []
+
 ############################
 ##### Helper Functions #####
 ############################
@@ -53,6 +56,18 @@ async def roll(ctx, dice: str):
             await ctx.send(message)
     else:
         await ctx.send("Invalid dice notation! Use the format 'NdS' where N is number of dice and S is sides.")
+
+@bot.command(name='init')
+async def init(ctx, com: str):
+    com = com.lower()
+    if com == "add":
+        await ctx.send("Add init to order")
+    elif com == "remove":
+        await ctx.send("Remove init from order")
+    elif com == "show":
+        await ctx.send("Show order")
+    else:
+        await ctx.send("Command unknown for 'init'")
 
 ##################
 ##### Events #####
