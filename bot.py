@@ -38,7 +38,7 @@ async def add_or_update_user(discord_id, name: str, role: str):
         cursor = await db.execute('SELECT * FROM users WHERE discord_id = ?', (discord_id,))
         result = await cursor.fetchone()
         if result:
-            await db.execute('UPDATE users SET name = ? WHERE discord_id = ?, role = ?', (name, discord_id, role))
+            await db.execute('UPDATE users SET name = ?, role = ? WHERE discord_id = ?', (name, discord_id, role))
         else:
             await db.execute('INSERT INTO users (discord_id, name, role) VALUES (?, ?, ?)', (discord_id, name, role))
         await db.commit()
