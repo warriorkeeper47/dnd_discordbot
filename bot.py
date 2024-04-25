@@ -42,6 +42,13 @@ async def add_or_update_user(discord_id, name):
             await db.execute('INSERT INTO users (discord_id, name) VALUES (?, ?)', (discord_id, name))
         await db.commit()
 
+async def print_all_users():
+    #userStr = f""
+    async with aiosqlite.connect('bot_database.db') as db:
+        cursor = await db.execute('SELECT * FROM users')
+        result = await cursor.fetchone()
+        if result:
+            print(result)
 
 ############################
 ##### Helper Functions #####
@@ -111,6 +118,10 @@ async def register(ctx):
     await add_or_update_user(discord_id, name)
     await ctx.send(f"{name}, you have been registered/updated.")
 
+@bot.command(name='printUsers')
+async def register(ctx):
+    message = print_all_users()
+    await ctx.send(message)
 
 @bot.command(name='roll')
 async def roll(ctx, dice: str):
@@ -172,5 +183,6 @@ async def init(ctx, com: str, name: str=None, roll: int=0):
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
+    await setup_database()
 
 bot.run(TOKEN)
