@@ -220,5 +220,11 @@ async def init(ctx, com: str, name: str=None, roll: int=0):
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
     await setup_database()
+    await update_database_schema()
+
+async def update_database_schema():
+    async with aiosqlite.connect('bot_database.db') as db:
+        await db.execute('ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT')
+        await db.commit()
 
 bot.run(TOKEN)
