@@ -23,6 +23,7 @@ initOrder = []
 ############################
 ##### Helper Functions #####
 ############################
+
 def parse_dice_roll(notation):
     try:
         num_dice, sides = notation.lower().split('d')
@@ -39,6 +40,37 @@ def roll_dice(num_dice, sides):
     results = [random.randint(1, sides) for _ in range(num_dice)]
     total = sum(results)
     return results, f"You rolled {num_dice}d{sides}: {results} Total: {total}"
+
+def sort_init():
+    initOrder.sort(key=lambda x: x[1], reverse=True)
+
+def show_init():
+    sort_init()
+    return f"Initiative order: "
+
+def add_init(name, roll):
+    if name not in initOrder:
+        initOrder.append((name, roll))
+        sort_init()
+        message=f"Added {name} with initiative {roll}."
+    # else update?
+    else:
+        message=f"'{name}' already in initiative order."
+    return message
+
+def remove_init(name):
+    if name in initOrder:
+        initOrder.remove(name)
+        message=f"Removed {name} from initiative order."
+    else:
+        message=f"Name '{name}' not found in initiative order."
+    return message
+
+def clear_init():
+    initOrder.clear()
+    return f"Initiative order has been cleared."
+
+
 
 ####################
 ##### Commands #####
@@ -62,14 +94,24 @@ async def roll(ctx, dice: str):
         ctx.send("Invalid prompt.")
 
 @bot.command(name='init')
-async def init(ctx, com: str):
+async def init(ctx, com: str, name: str=None, roll: int=0):
     com = com.lower()
     if com == "add":
-        await ctx.send("Add init to order")
+        if roll <= 0 or roll==None:
+            await ctx.send("No number given for initiative order.")
+        else:
+            message = add_init(name, roll)
+            await ctx.send(message)
     elif com == "remove":
-        await ctx.send("Remove init from order")
+        if name==None or name=="":
+            await ctx.send("No name given to remove from initiative order.")
+        else:
+            remove_init(name)
+            await ctx.send(message)
     elif com == "show":
-        await ctx.send("Show order")
+        await ctx.send(show_init())
+    elif com == "clear":
+        clear_init()
     else:
         await ctx.send("Command unknown for 'init'")
 
