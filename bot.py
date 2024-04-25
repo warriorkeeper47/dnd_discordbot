@@ -10,11 +10,12 @@ from dotenv import load_dotenv
 intents = discord.Intents.all()
 
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = "MTIzMjQ3NDkwODM0MTA0NzM3Nw.G0XG_a.88RFhXdZk5HB8NX_BTNVQOD4SFw_Lw8Qe6wN_o" 
+#os.getenv('DISCORD_TOKEN')
 
 bot = discord.Client(intents=intents)
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='/', intents=intents)
 
 ### Global Variables ###
 initOrder = []
@@ -46,16 +47,19 @@ def roll_dice(num_dice, sides):
 @bot.command(name='roll')
 async def roll(ctx, dice: str):
     # input notation examples: '2d6', '1d4', 5d12'
-    parsed = parse_dice_roll(dice)
-    if parsed:
-        num_dice, sides = parsed
-        results, message = roll_dice(num_dice, sides)
-        if results is not None:
-            await ctx.send(message)
+    try:
+        parsed = parse_dice_roll(dice)
+        if parsed:
+            num_dice, sides = parsed
+            results, message = roll_dice(num_dice, sides)
+            if results is not None:
+                await ctx.send(message)
+            else:
+                await ctx.send(message)
         else:
-            await ctx.send(message)
-    else:
-        await ctx.send("Invalid dice notation! Use the format 'NdS' where N is number of dice and S is sides.")
+            await ctx.send("Invalid dice notation! Use the format 'NdS' where N is number of dice and S is sides.")
+    except ValueError:
+        ctx.send("Invalid prompt.")
 
 @bot.command(name='init')
 async def init(ctx, com: str):
