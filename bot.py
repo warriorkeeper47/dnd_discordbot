@@ -61,12 +61,12 @@ def add_init(name, roll):
 
 def remove_init(name):
     global initOrder
-    if name in initOrder:
-        removedArr = [n for n in initOrder if n[0] != name]
-        initOrder = removedArr
-        message=f"Removed {name} from initiative order."
-    else:
+    removedArr = [n for n in initOrder if n[0] != name]
+    if removedArr == initOrder:
         message=f"Name '{name}' not found in initiative order."
+    else:
+        initOrder = removedArr
+        message=f"Removed {name} from initiative order."    
     return message
 
 def clear_init():
