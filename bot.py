@@ -50,16 +50,15 @@ def show_init():
     return f"Initiative order: {initOrder}"
 
 def add_init(name, roll):
-    if name not in initOrder:
-        initOrder.append((name, roll))
-        sort_init()
-        message=f"Added {name} with initiative {roll}."
-    else:
-        remove_init(name)
-        add_init(name, roll)
-        sort_init()
-        message=f"'{name}' already in initiative order. Updated number {roll}"
-    return message
+    global initOrder
+    for i, (existing_name, _) in enumerate(initOrder):
+        if existing_name == name:
+            initOrder[i] = (name, roll)  # Update
+            sort_init()
+            return f"'{name}' already in initiative order. Updated number to {roll}."
+    initOrder.append((name, roll))
+    sort_init()
+    return f"Added {name} with initiative {roll}."
 
 def remove_init(name):
     global initOrder
