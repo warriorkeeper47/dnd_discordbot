@@ -222,9 +222,15 @@ async def on_ready():
     await setup_database()
     await update_database_schema()
 
+async def column_exists(db, table_name, column_name):
+    cursor = await db.execute(f"PRAGMA table_info({table_name})")
+    columns = await cursor.fetchall()
+    return any(column_name == column[1] for column in columns)
+
 async def update_database_schema():
     async with aiosqlite.connect('bot_database.db') as db:
-        await db.execute('ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT')
-        await db.commit()
+        if not await column_exists(db, 'users', 'role'):
+            await db.execute('ALTER TABLE users ADD COLUMN role TEXT')
+            await db.commit()
 
 bot.run(TOKEN)
