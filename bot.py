@@ -41,12 +41,13 @@ def roll_dice(num_dice, sides):
     total = sum(results)
     return results, f"You rolled {num_dice}d{sides}: {results} Total: {total}"
 
+# Initiative methods
 def sort_init():
     initOrder.sort(key=lambda x: x[1], reverse=True)
 
 def show_init():
     sort_init()
-    return f"Initiative order: "
+    return f"Initiative order: {initOrder}"
 
 def add_init(name, roll):
     if name not in initOrder:
@@ -60,7 +61,8 @@ def add_init(name, roll):
 
 def remove_init(name):
     if name in initOrder:
-        initOrder.remove(name)
+        removedArr = [n for n in initOrder if n[0] != name]
+        initOrder = removedArr
         message=f"Removed {name} from initiative order."
     else:
         message=f"Name '{name}' not found in initiative order."
@@ -106,12 +108,13 @@ async def init(ctx, com: str, name: str=None, roll: int=0):
         if name==None or name=="":
             await ctx.send("No name given to remove from initiative order.")
         else:
-            remove_init(name)
+            message = remove_init(name)
             await ctx.send(message)
     elif com == "show":
         await ctx.send(show_init())
     elif com == "clear":
-        clear_init()
+        message = clear_init()
+        await ctx.send(message)
     else:
         await ctx.send("Command unknown for 'init'")
 
