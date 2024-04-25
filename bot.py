@@ -28,18 +28,19 @@ async def setup_database():
         await db.execute('''CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             discord_id INTEGER UNIQUE,
-            name TEXT
+            name TEXT,
+            role TEXT
         )''')
         await db.commit()
 
-async def add_or_update_user(discord_id, name):
+async def add_or_update_user(discord_id, name: str, role: str):
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute('SELECT * FROM users WHERE discord_id = ?', (discord_id,))
         result = await cursor.fetchone()
         if result:
-            await db.execute('UPDATE users SET name = ? WHERE discord_id = ?', (name, discord_id))
+            await db.execute('UPDATE users SET name = ? WHERE discord_id = ?, role = ?', (name, discord_id, role))
         else:
-            await db.execute('INSERT INTO users (discord_id, name) VALUES (?, ?)', (discord_id, name))
+            await db.execute('INSERT INTO users (discord_id, name, role) VALUES (?, ?, ?)', (discord_id, name, role))
         await db.commit()
 
 async def print_all_users():
@@ -58,6 +59,22 @@ async def print_all_users():
 ##### Helper Functions #####
 ############################
 
+# Roles and Permissions
+async def assign_role(discord_id, role):
+    async with aiosqlite.connect('bot_database.db') as db:
+        await db.execute('UPDATE users SET role = ? WHERE discord_id = ?', (role, discord_id))
+        await db.commit()
+
+async def check_permission(ctx):
+    async with aiosqlite.connect('bot_database.db') as db:
+        cursor = await db.execute('SELECT role FROM users WHERE discord_id = ?', (ctx.author.id,))
+        role = await cursor.fetchone()
+        if role:
+            return role[0]
+        else:
+            return None
+
+# Dice Rolls
 def parse_dice_roll(notation):
     try:
         num_dice, sides = notation.lower().split('d')
@@ -75,7 +92,7 @@ def roll_dice(num_dice, sides):
     total = sum(results)
     return results, f"You rolled {num_dice}d{sides}: {results} Total: {total}"
 
-# Initiative methods
+# Initiative
 def sort_init():
     initOrder.sort(key=lambda x: x[1], reverse=True)
 
@@ -108,6 +125,7 @@ def clear_init():
     initOrder.clear()
     return f"Initiative order has been cleared."
 
+# Character Building
 def generate_name():
     return "John" #TODO update to include Faker library
 
@@ -115,11 +133,25 @@ def generate_name():
 ##### Commands #####
 ####################
 
+@bot.command(name='setrole')
+#@commands.has_permissions(administrator=True)
+async def set_role(ctx, member: discord.Member, role: str="player"):
+    await assign_role(member.id, role)
+    await ctx.send(f"Role {role} assigned to {member.name}.")
+
+@bot.command(name='myrole')
+async def my_role(ctx):
+    role = await check_permission(ctx)
+    if role:
+        await ctx.send(f"Your role is {role}.")
+    else:
+        await ctx.send("You do not have a role assigned.")
+
 @bot.command(name='register')
-async def register(ctx):
+async def register(ctx, role:str="player"): # TODO check if admin
     discord_id = ctx.author.id  # Discord ID
     name = ctx.author.name      # Discord username
-    await add_or_update_user(discord_id, name)
+    await add_or_update_user(discord_id, name, role)
     await ctx.send(f"{name}, you have been registered/updated.")
 
 @bot.command(name='printUsers')
