@@ -2,7 +2,7 @@
 import discord
 import os
 from discord.ext import commands
-import aiosqlite
+import aiosqlite # TODO store roles and profiles
 import random
 from datetime import datetime
 from dotenv import load_dotenv
@@ -54,9 +54,11 @@ def add_init(name, roll):
         initOrder.append((name, roll))
         sort_init()
         message=f"Added {name} with initiative {roll}."
-    # else update?
     else:
-        message=f"'{name}' already in initiative order."
+        remove_init(name)
+        add_init(name, roll)
+        sort_init()
+        message=f"'{name}' already in initiative order. Updated number {roll}"
     return message
 
 def remove_init(name):
@@ -73,7 +75,8 @@ def clear_init():
     initOrder.clear()
     return f"Initiative order has been cleared."
 
-
+def generate_name():
+    return "John" #TODO update to include Faker library
 
 ####################
 ##### Commands #####
@@ -108,6 +111,15 @@ async def init(ctx, com: str, name: str=None, roll: int=0):
         else:
             message = add_init(name, roll)
             await ctx.send(message)
+    elif com == "addnpc":
+        if roll == None or roll <= 0:
+            roll = roll_dice(1, 20)
+            await ctx.send("No dice roll found... Rolling dice for NPC...")
+        if name == None or name == "":
+            name = generate_name()
+            await ctx.send("No name found... Generating name for NPC...")
+        message = add_init(name, roll)
+        await ctx.send(message)
     elif com == "remove":
         if name==None or name=="":
             await ctx.send("No name given to remove from initiative order.")
