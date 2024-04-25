@@ -43,12 +43,16 @@ async def add_or_update_user(discord_id, name):
         await db.commit()
 
 async def print_all_users():
-    #userStr = f""
+    users = []
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT * FROM users')
-        result = await cursor.fetchone()
-        if result:
-            print(result)
+        cursor = await db.execute('SELECT discord_id, name FROM users')
+        rows = await cursor.fetchall()
+        if rows:
+            for row in rows:
+                users.append(f"ID: {row[0]}, Name: {row[1]}")
+            return "\n".join(users)
+        else:
+            return "No users found in the database."
 
 ############################
 ##### Helper Functions #####
@@ -120,7 +124,7 @@ async def register(ctx):
 
 @bot.command(name='printUsers')
 async def register(ctx):
-    message = print_all_users()
+    message = await print_all_users()
     await ctx.send(message)
 
 @bot.command(name='roll')
