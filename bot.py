@@ -70,8 +70,10 @@ async def check_permission(ctx):
         cursor = await db.execute('SELECT role FROM users WHERE discord_id = ?', (ctx.author.id,))
         role = await cursor.fetchone()
         if role:
+            print(f"role: {role[0]}")
             return role[0]
         else:
+            print("no role found")
             return None
 
 # Dice Rolls
@@ -188,7 +190,7 @@ async def init(ctx, com: str, name: str=None, roll: int=0):
         else:
             message = add_init(name, roll)
             await ctx.send(message)
-    elif com == "addnpc":
+    elif com == "addnpc": #TODO not working as expected
         if roll == None or roll <= 0:
             roll = roll_dice(1, 20)
             await ctx.send("No dice roll found... Rolling dice for NPC...")
