@@ -65,9 +65,9 @@ async def assign_role(discord_id, role):
         await db.execute('UPDATE users SET role = ? WHERE discord_id = ?', (role, discord_id))
         await db.commit()
 
-async def check_permission(ctx):
+async def check_permission(ctx, memberID:str=""):
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT role FROM users WHERE discord_id = ?', (ctx.author.id,))
+        cursor = await db.execute('SELECT role FROM users WHERE discord_id = ?', (memberID))
         role = await cursor.fetchone()
         if role:
             print(f"role: {role[0]}")
@@ -141,9 +141,18 @@ async def set_role(ctx, member: discord.Member, role: str="player"):
     await assign_role(member.id, role)
     await ctx.send(f"Role {role} assigned to {member.name}.")
 
+@bot.command(name='getrole')
+async def get_role(ctx, member: discord.Member):
+    role = await check_permission(ctx, member.id)
+    if role:
+        await ctx.send(f"{member.name}'s role is {role}.")
+    else:
+        await ctx.send(f"{member.name} does not have a role assigned.")
+    
+
 @bot.command(name='myrole')
 async def my_role(ctx):
-    role = await check_permission(ctx)
+    role = await check_permission(ctx, ctx.author.id)
     if role:
         await ctx.send(f"Your role is {role}.")
     else:
